@@ -1,0 +1,9 @@
+{
+    "name": "nft-drop",
+    "version": "1.0.0",
+    "scripts":{
+        "move:init" : "aptos init",
+        "move:compile": "aptos move compile --package-dir . ",
+        "move:publish": "aptos move publish --package-dir . --network testnet"
+    }   
+}
