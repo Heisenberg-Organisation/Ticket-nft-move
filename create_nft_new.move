@@ -54,8 +54,7 @@ module nft-drop::create_nft_getting_production_ready {
         signer_cap: account::SignerCapability,
         fee_payee: address,
         collections_table: vector<Concert>
-        // create event for sale
-        // cancellation of tickets - refund 
+        
 
     }
     // create artist - new account for artist to create collection
@@ -193,15 +192,13 @@ module nft-drop::create_nft_getting_production_ready {
                     artist_name: string::utf8(b"Artist name"),
                     artist_address: signer::address_of(&resource_signer)
                 }
+                current_owner: receiver_addr,
+                expiration_time: module_data.expiration_timestamp,
+                event_start: timestamp::now_seconds(),
+                price: 100
+
             }
         );
-
-        // event::emit(
-        //     Art{
-        //         token_receiver_address: receiver_addr,
-        //         token_data_id: module_data.token_data_id,
-        //     }
-        // );
 
         // mutate the token properties to update the property version of this token
         let (creator_address, collection, name) = token::get_token_data_id_fields(&module_data.token_data_id);
@@ -247,6 +244,87 @@ module nft-drop::create_nft_getting_production_ready {
 
     // create artist - new account for artist to open market
     // triggering this every time a new artist is created 
+    public entry fun create_artist(
+        caller: &signer,
+        artist_name: string,
+        artist_address: address,
+        fee_numerator: u64,
+        fee_payee: address
+    ) acquires Artist {
+        let caller_address = signer::address_of(caller);
+        assert!(caller_address == @admin_addr, error::permission_denied(ENOT_AUTHORIZED));
+        let artist_id = ArtistId {
+            artist_name: artist_name,
+            artist_address: artist_address
+        };
+        let signer_cap = account::create_signer_capability(caller);
+        let collections_table = vector::empty<Concert>();
+        let artist = Artist {
+            artist_id: artist_id,
+            fee_numerator: fee_numerator,
+            signer_cap: signer_cap,
+            fee_payee: fee_payee,
+            collections_table: collections_table
+        };
+        move_to(caller, artist);
+    }
+    // a functions for
+    // check for existence of the artist
+    // adding new concert to the artist
+    public entry fun create_concert(
+        caller: &signer,
+        artist_id: ArtistId,
+        concert_name: string,
+        start_time: timestamp,
+        end_time: timestamp,
+        max_no_tickets: u64,
+        ticket_price: u64
+    ) acquires Artist {
+        let caller_address = signer::address_of(caller);
+        assert!(caller_address == @admin_addr, error::permission_denied(ENOT_AUTHORIZED));
+        let artist = borrow_global_mut<Artist>(artist_id);
+        let concert = Concert {
+            concert_name: concert_name,
+            start_time: start_time,
+            end_time: end_time,
+            max_no_tickets: max_no_tickets,
+            ticket_price: ticket_price,
+            ticket_sold: 0,
+            list_tickets: vector::empty<TicketMinting>()
+        };
+        // check for existence of the artistid 
+        assert(artist.artist_id.artist_address == artist_id.artist_address, error::invalid_argument(EINVALID_PROOF_OF_KNOWLEDGE));
+
+        // pushing into the collections table
+        vector::push(&mut artist.collections_table, concert);
+        // minting the max_no_tickets for the concert
+        for i in 0..max_no_tickets {
+            mint_event_ticket(&artist_id, ticket_price, start_time, end_time);
+        }
+    }
+    // create a function get one of the minted nfts from the concert given the callerm artist id, concert index and ticket id
+    public entry fun get_ticket(
+        caller: &signer,
+        artist_id: ArtistId,
+        concert_index: u64,
+        ticket_id: u64
+    ) acquires Artist {
+        let caller_address = signer::address_of(caller);
+        assert!(caller_address == @admin_addr, error::permission_denied(ENOT_AUTHORIZED));
+        let artist = borrow_global_mut<Artist>(artist_id);
+        let concert = vector::borrow_mut(&mut artist.collections_table, concert_index);
+        let ticket = vector::borrow_mut(&mut concert.list_tickets, ticket_id);
+        // check if the ticket is sold
+        assert(ticket.current_owner == artist_id.artist_address, error::invalid_argument(EINVALID_PROOF_OF_KNOWLEDGE));
+        // transfer the ticket to the caller
+        token::direct_transfer(&artist_id, caller, ticket.token_data_id, 1);
+        // update the ticket owner
+        ticket.current_owner = caller_address;
+        // update the ticket sold
+        concert.ticket_sold = concert.ticket_sold + 1;
+    }
+    // cancellation of concert - refund 
+
     
 
     /// Verify that the collection token minter intends to mint the given token_data_id to the receiver
