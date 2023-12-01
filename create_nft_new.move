@@ -369,11 +369,26 @@ module mint_nft::create_nft_getting_production_ready {
         timestamp::update_global_time_for_test_secs(timestamp);
 
         create_account_for_test(signer::address_of(&origin_account));
+        create_account_for_test(signer::address_of(&artist_addr));
+        create_account_for_test(signer::address_of(&artist_addr2));
 
         // create a resource account from the origin account, mocking the module publishing process
+        initialize_with_artist(&origin_account, artist_addr, 10);
+        add_artist_to_collection(&origin_account, artist_addr2, 10, artist_addr2);
+        debug::print(b"artist_collection1: ");
+        debug::print(simple_map::get(&borrow_global<ArtistCollection>(@source_addr).artist_collection, artist_addr));
+        debug::print(b"artist_collection2: ");
+        debug::print(simple_map::get(&borrow_global<ArtistCollection>(@source_addr).artist_collection, artist_addr2));
+
         resource_account::create_resource_account(&origin_account, vector::empty<u8>(), vector::empty<u8>());
 
+        
+
         init_module(resource_account);
+
+        
+
+        
 
         let admin = create_account_for_test(@admin_addr);
         let pk_bytes = ed25519::validated_public_key_to_bytes(collection_token_minter_public_key);
