@@ -5,12 +5,12 @@ license = "MIT"
 
 
 [dependencies]
-AptosFramework = { local = "../../../framework/aptos-framework" }
-AptosStdlib = { local = "../../../framework/aptos-stdlib"}
-AptosToken = { local = "../../../framework/aptos-token" }
+AptosFramework = { local = "./framework/aptos-framework" }
+AptosStdlib = { local = "./framework/aptos-stdlib"}
+AptosToken = { local = "./framework/aptos-token" }
 
 [addresses]
 aptos_framework = "0x1"
-aptos_std = "0x2"
+aptos_stdlib = "0x1"
 aptos_token = "0x3"
-admin_addr = "_"
+admin_addr = "0x5cd95ac120e54db7c5290c362051c4f0f7d66aecceec56ca7493827ab531599f"
