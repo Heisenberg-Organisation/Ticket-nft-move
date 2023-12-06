@@ -6,7 +6,7 @@ module pool::apt_transfer
     use 0x1::vector;
     use 0x1::signer;
 
-    const E_NOT_ENOUGH_COINS:u64 = 101;
+    const E_NOT_ENOUGH_COINS:u64 = 110;
 
     public fun ms_trans(from: &signer,to: address, amount:u64)  
     {

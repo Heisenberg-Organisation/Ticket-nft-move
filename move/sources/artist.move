@@ -15,6 +15,7 @@ struct Ticket has key, store , drop, copy {
     artist: address,
     startTime: u64,
     endTime: u64,
+    streamLink: String
     }
 
 struct ArtistTicketCollection has key, store, drop,copy {
@@ -31,24 +32,25 @@ struct ArtistTicketCollection has key, store, drop,copy {
 
 struct Artist has key, store,drop,copy{
     artistName: String,
-    artistCollection: vector<ArtistTicketCollection>,
-    name2collection: SimpleMap<String, ArtistTicketCollection>,
+    artistCollection: vector<u64>,
+    // name2collection: SimpleMap<String, ArtistTicketCollection>,
     }
 
 
 struct UserTicketCollection has key, store,drop {
     user_addr: address,
     governanceTicket:u64,
-    ticketList: vector<Ticket>,
+    ticketList: vector<u64>,
     }
 
 
 struct Storage has store ,key ,drop {
     artists: SimpleMap<address, Artist>,
     users: SimpleMap<address, UserTicketCollection>,
-    a2u:SimpleMap<address,  vector<Ticket>>,
-    u2u:SimpleMap<address,  vector<Ticket>>,
-    
+    // a2u: SimpleMap<address,  vector<Ticket>>,
+    // u2u: SimpleMap<address,  vector<Ticket>>,
+    eventCollection: SimpleMap<vector<u8>, ArtistTicketCollection>
+    ticketCollection: SimpleMap<u64, Ticket>
     }
 
     const AUTHORIZATION_ERROR: u64 = 1;
@@ -73,8 +75,10 @@ public fun init_storage(creator:&signer) {
             let storage = Storage {
                 artists: simple_map::create<address, Artist>(),
                 users: simple_map::create<address, UserTicketCollection>(),
-                a2u: simple_map::create<address, vector<Ticket>> (),
-                u2u: simple_map::create<address, vector<Ticket>> (),
+                // a2u: simple_map::create<address, vector<Ticket>> (),
+                // u2u: simple_map::create<address, vector<Ticket>> (),
+                eventCollection: simple_map::create<vector<u8>, ArtistTicketCollection>(),
+                // ticketCollection: simple_map::create<u64, Ticket>(),
             };
     move_to<Storage>(creator, storage);
 
@@ -97,32 +101,68 @@ public fun createArtist(artist: &signer, artistName: String) acquires Storage{
     let storage:&mut Storage = borrow_global_mut<Storage>(Creator_account);
     let artist_obj = Artist {
         artistName: artistName,
-        artistCollection: vector::empty<ArtistTicketCollection>(),
-        name2collection: simple_map::create<String, ArtistTicketCollection>(),
+        artistCollection: vector::empty<u64>(),
+        // name2collection: simple_map::create<String, ArtistTicketCollection>(),
     };
     simple_map::add(&mut storage.artists, signer::address_of(artist), artist_obj);
     }
 
 
 
-public fun createNewArtistCollection(a_Creator: &signer, eventName: String, price: u64, num_tickets: u64, startTime: u64, endTime: u64,banner:String) acquires Storage{
+public fun createNewArtistCollection(a_Creator: &signer, eventName: String, price: u64, num_tickets: u64, startTime: u64, endTime: u64,banner:String, link: String) acquires Storage{
+    // let storage:&mut Storage =borrow_global_mut<Storage>(Creator_account);
+    // let artist:&mut Artist=simple_map::borrow_mut(&mut storage.artists, &signer::address_of(a_Creator));
+    // let ticket_list = vector::empty<Ticket>();
+    // let uid=generateTID(artist.artistName, eventName);
+    // let max_tickets=num_tickets;
+
+    // while(num_tickets > 0){
+    //     let ticket:Ticket=Ticket{
+    //         eventId:uid,
+    //         ticketId:vector::length(&ticket_list),
+    //         owner: signer::address_of(a_Creator),
+    //         artist: signer::address_of(a_Creator),
+    //         startTime: startTime,
+    //         endTime: endTime,
+    //         streamLink: String::from(""),
+    //         };
+    //     vector::push_back<Ticket>(&mut ticket_list, ticket);
+    //     num_tickets = num_tickets - 1;
+    // };       
+    // let artistCollection:ArtistTicketCollection = ArtistTicketCollection {
+    //     eventName: eventName,
+    //     price: price,
+    //     maxTickets: max_tickets,
+    //     ticketList:ticket_list,
+    //     availableForSale: false,
+    //     startTime: startTime,
+    //     endTime: endTime,
+    //     author:signer::address_of(a_Creator),
+    //     banner:banner,
+    // };
+    // simple_map::add(&mut artist.name2collection, eventName, artistCollection);
+    // vector::push_back(&mut artist.artistCollection, artistCollection);
+
     let storage:&mut Storage =borrow_global_mut<Storage>(Creator_account);
     let artist:&mut Artist=simple_map::borrow_mut(&mut storage.artists, &signer::address_of(a_Creator));
     let ticket_list = vector::empty<Ticket>();
     let uid=generateTID(artist.artistName, eventName);
+    let eventID = vector::length(&Storage.eventCollection);
     let max_tickets=num_tickets;
-    while(num_tickets > 0){
+
+    while (num_tickets > 0){
         let ticket:Ticket=Ticket{
-            eventId:uid,
+            eventId:eventID,
             ticketId:vector::length(&ticket_list),
             owner: signer::address_of(a_Creator),
             artist: signer::address_of(a_Creator),
             startTime: startTime,
             endTime: endTime,
+            streamLink: String::from(""),
             };
-    vector::push_back<Ticket>(&mut ticket_list, ticket);
-    num_tickets = num_tickets - 1;
-    };       
+        vector::push_back<Ticket>(&mut ticket_list, ticket);
+        num_tickets = num_tickets - 1;
+    };
     let artistCollection:ArtistTicketCollection = ArtistTicketCollection {
         eventName: eventName,
         price: price,
@@ -131,54 +171,73 @@ public fun createNewArtistCollection(a_Creator: &signer, eventName: String, pric
         availableForSale: false,
         startTime: startTime,
         endTime: endTime,
-        author:signer::address_of(a_Creator),
-        banner:banner,
-    };
-    simple_map::add(&mut artist.name2collection, eventName, artistCollection);
-    vector::push_back(&mut artist.artistCollection, artistCollection);
     }
-
-
+    simple_map::add(&mut storage.eventCollection, uid, artistCollection);
+    vector::push_back(&mut artist.artistCollection, eventID);
+    }
 
 public fun createCollection_user(user: &signer) acquires Storage{
     let storage:&mut Storage = borrow_global_mut<Storage>(Creator_account);
     let utc:UserTicketCollection = UserTicketCollection{
-    user_addr: signer::address_of(user),
-    ticketList: vector::empty<Ticket>(),
-    governanceTicket:0,
+        user_addr: signer::address_of(user),
+        governanceTicket:0,
+        ticketList: vector::empty<u64>(),
     };
-    simple_map::add(&mut storage.users,signer::address_of(user),utc);
+    simple_map::add(&mut storage.users, signer::address_of(user), utc);
     }
 
-public fun TransferTicket(user: &signer, artist_addr: address, artistCollection: String ) acquires Storage {
+public fun TransferTicket(user: &signer, artist_addr: address, eventName: String ) acquires Storage {
+    // let storage:&mut Storage = borrow_global_mut<Storage>(Creator_account);
+    // let u2u = &mut storage.u2u;
+    // let artist:&mut Artist=simple_map::borrow_mut(&mut storage.artists, &artist_addr);
+    // let artistCollection = simple_map::borrow_mut(&mut artist.name2collection, &artistCollection);
+    // assert!(artistCollection.maxTickets>0,105);
+    // artistCollection.maxTickets=artistCollection.maxTickets-1;
+    // let artist_ticktes=&mut artistCollection.ticketList;
+    // assert!(vector::length(artist_ticktes)>0,105);
+    // let ticketId = vector::length(artist_ticktes) - 1;
+    // // assert!(artistCollection.availableForSale==true,404);
+    // let artist_ticket = &mut artistCollection.ticketList;      
+    // let users_collection:&mut UserTicketCollection=simple_map::borrow_mut(&mut storage.users, &signer::address_of(user));
+    // let user_tickets:&mut vector<Ticket> = &mut users_collection.ticketList;
+    // users_collection.governanceTicket=users_collection.governanceTicket+25;
+    // let price: u64 = artistCollection.price;
+    // apt_transfer::ms_trans(user,artist_addr, price);
+    // let ticket= vector::borrow_mut(artist_ticket,ticketId);
+    // ticket.owner=signer::address_of(user);
+    // let ticket2tranfer = vector::borrow_mut<Ticket>(&mut artistCollection.ticketList, ticketId);
+    // vector::push_back(user_tickets,*ticket2tranfer);
+    // simple_map::upsert(&mut storage.a2u,signer::address_of(user),*user_tickets);
+    // simple_map::upsert(u2u,signer::address_of(user),*user_tickets);
+    // vector::remove(&mut artistCollection.ticketList, ticketId);  
+
     let storage:&mut Storage = borrow_global_mut<Storage>(Creator_account);
-    let u2u = &mut storage.u2u;
     let artist:&mut Artist=simple_map::borrow_mut(&mut storage.artists, &artist_addr);
-    let artistCollection = simple_map::borrow_mut(&mut artist.name2collection, &artistCollection);
+    let uid = generateTID(artist.artistName, eventName);
+    let artistCollection = simple_map::borrow_mut(&mut storage.eventCollection, &uid);
+    assert!(artistCollection.maxTickets>0,105);
     artistCollection.maxTickets=artistCollection.maxTickets-1;
     let artist_ticktes=&mut artistCollection.ticketList;
+    assert!(vector::length(artist_ticktes)>0,105);
     let ticketId = vector::length(artist_ticktes) - 1;
-    assert!(artistCollection.availableForSale==true,404);
-    let artist_ticket = &mut artistCollection.ticketList;      
+    // assert!(artistCollection.availableForSale==true,404);
+    let artist_ticket = &mut artistCollection.ticketList;
     let users_collection:&mut UserTicketCollection=simple_map::borrow_mut(&mut storage.users, &signer::address_of(user));
-    let user_tickets:&mut vector<Ticket> = &mut users_collection.ticketList;
-    users_collection.governanceTicket=users_collection.governanceTicket+25;
+    let user_tickets:&mut vector<u64> = &mut users_collection.ticketList;
     let price: u64 = artistCollection.price;
     apt_transfer::ms_trans(user,artist_addr, price);
     let ticket= vector::borrow_mut(artist_ticket,ticketId);
     ticket.owner=signer::address_of(user);
-    let ticket2tranfer = vector::borrow_mut<Ticket>(&mut artistCollection.ticketList, ticketId);
-    vector::push_back(user_tickets,*ticket2tranfer);
-    simple_map::upsert(&mut storage.a2u,signer::address_of(user),*user_tickets);
-    simple_map::upsert(u2u,signer::address_of(user),*user_tickets);
-    vector::remove(&mut artistCollection.ticketList, ticketId);  
+    vector::push_back(user_tickets,ticketId);
+    simple_map::upsert(&mut storage.users,signer::address_of(user),*users_collection);
+    vector::remove(&mut artistCollection.ticketList, ticketId);
     }
      
 
 public fun setforsale(artist:&signer,artistCollection:String) acquires Storage{    
     let storage:&mut Storage = borrow_global_mut<Storage>(Creator_account);
     let artistt:&mut Artist=simple_map::borrow_mut(&mut storage.artists, &signer::address_of(artist));
-    let artistCollection = simple_map::borrow_mut(&mut artistt.name2collection, &artistCollection);
+    // let artistCollection = simple_map::borrow_mut(&mut artistt.name2collection, &artistCollection);
     artistCollection.availableForSale=true;
     }
 
@@ -194,6 +253,7 @@ public entry fun u2u(kispe:&signer,kisse:address,price:u64,id:u64) acquires Stor
     let price2u = price*9/10;
     apt_transfer::ms_trans(kispe,kisse, price2u);
     ticket_to_transfer.owner=signer::address_of(kispe);
+    // user.governanceTicket=user.governanceTicket+25;
     vector::push_back(ticket_kispe_vector, *ticket_to_transfer);
     simple_map::remove(u2u,&kisse);
     remove_main_user(id,kisse);                                                                                                                                                                                                                                                                                                                                                                             
@@ -205,9 +265,13 @@ public fun remove_main_user(id:u64,kisse:address) acquires Storage{
     let user_kisse = &mut storage.users;
     let user: &mut UserTicketCollection= simple_map::borrow_mut(user_kisse,&kisse);
     let ticket_kisse_vector = &mut user.ticketList;
+    // user.governanceTicket=user.governanceTicket-25;
     vector::remove(ticket_kisse_vector,id);
     }
 
-
-
+// the owner can burn the ticket after start of the event, but before the end of the event
+// it will receive 25 governance token for this action 
+public entry fun burn(user: &signer, eventName: String, ticketId: u64) acquires Storage { 
+    
+    }
 }
