@@ -1,4 +1,4 @@
-module my_addrx::apt_transfer
+module pool::apt_transfer
 {
     use 0x1::coin;
     use 0x1::aptos_coin::AptosCoin; 
