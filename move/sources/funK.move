@@ -37,8 +37,8 @@ public entry fun create_artist(artist: &signer,artist_name:String)  {
 }
 
 
-public entry fun artist_collection(artist: &signer, event_name: String, price: u64, num_tickets: u64, start_time: u64, end_time: u64,banner:String)  {
-    artist_marketplace::createNewArtistCollection(artist, event_name, price, num_tickets, start_time, end_time,banner)  
+public entry fun artist_collection(artist: &signer, event_name: String, price: u64, num_tickets: u64, start_time: u64, end_time: u64,banner:String, link:String)  {
+    artist_marketplace::createNewArtistCollection(artist, event_name, price, num_tickets, start_time, end_time,banner, link)  
 }
 
 
@@ -56,14 +56,14 @@ public entry fun init_storage(creator:&signer){
 }
 
 
-public entry fun transfer_ticket_u2u(giver:address,taker:&signer,price:u64,ticket_id:u64){
-    artist_marketplace::u2u(taker,giver,price,ticket_id)
-}
+// public entry fun transfer_ticket_u2u(giver:address,taker:&signer,price:u64,ticket_id:u64){
+//     artist_marketplace::u2u(taker,giver,price,ticket_id)
+// }
 
 
-public entry fun setforsale(artist:&signer,event:String){
-    artist_marketplace::setforsale(artist,event);
-}
+// public entry fun setforsale(artist:&signer,event:String){
+//     artist_marketplace::setforsale(artist,event);
+// }
 
 public entry fun init_music_storage(owner:&signer){
     Music::init(owner)

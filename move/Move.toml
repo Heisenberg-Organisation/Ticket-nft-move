@@ -1,16 +1,16 @@
 [package]
-name = "nft-drop"
+name = "Pool"
 version = "1.0.0"
-license = "MIT"
-
-
-[dependencies]
-AptosFramework = { local = "./framework/aptos-framework" }
-AptosStdlib = { local = "./framework/aptos-stdlib"}
-AptosToken = { local = "./framework/aptos-token" }
+authors = []
 
 [addresses]
-aptos_framework = "0x1"
-aptos_stdlib = "0x1"
-aptos_token = "0x3"
-admin_addr = "0x5cd95ac120e54db7c5290c362051c4f0f7d66aecceec56ca7493827ab531599f"
+pool="0x6a2713e6fc577763fc77dd88a3900b502e845a84a16e0051f7d097c44ba6daaf"
+
+[dev-addresses]
+
+[dependencies.AptosFramework]
+git = "https://github.com/aptos-labs/aptos-core.git"
+rev = "mainnet"
+subdir = "aptos-move/framework/aptos-framework"
+
+[dev-dependencies]
