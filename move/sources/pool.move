@@ -37,6 +37,7 @@ struct Storage has key,drop,store,copy {
 struct Pool has key,copy{
     user_addr:vector<address>,
     universe:SimpleMap<address, Storage>,
+    all_posts:vector<Post>,
 }
 
 
@@ -75,7 +76,8 @@ public fun init_pool(creator:&signer,owner:address) acquires Pool{
 public fun init_resources():Pool{
     Pool{
         user_addr:vector::empty<address>(),
-        universe:simple_map::create<address, Storage>()
+        universe:simple_map::create<address, Storage>(),
+        all_posts:vector::empty<Post>(),
     }
 }
 
@@ -101,13 +103,15 @@ public fun upload_Post(
             author:owner,
             liked:simple_map::create<address,bool>(),
             disliked:simple_map::create<address,bool>(),
-    };
+        };
     vector::push_back(&mut storage.post,newPost);
+    vector::push_back(&mut pool.all_posts,newPost);
     let x: &mut User =vector::borrow_mut(&mut storage.user, 0);
     x.governancePool=x.governancePool+1;
     x.postTotal = x.postTotal + 1;
     let borrowed_storage=*storage;
     simple_map::upsert(&mut pool.universe,owner,borrowed_storage); 
+
 }
 
 public fun upvotePost(owner:address, liked_addr:address,postId:u64) acquires Pool {
@@ -115,7 +119,6 @@ public fun upvotePost(owner:address, liked_addr:address,postId:u64) acquires Poo
     let pool:&mut Pool =borrow_global_mut<Pool>(contract_add);
     let storage:&mut Storage=simple_map::borrow_mut(&mut pool.universe, &liked_addr);
     let x: &mut User =vector::borrow_mut(&mut storage.user, 0);
-    x.governancePool=x.governancePool+1;
     let postIndex:u64 = postId;
     let required_post:&mut Post=vector::borrow_mut(&mut storage.post,postId);
     let isliked:&mut SimpleMap<address,bool> = &mut required_post.liked;
@@ -159,14 +162,11 @@ public fun upvotePost(owner:address, liked_addr:address,postId:u64) acquires Poo
 }
 
 
-
-
 public fun downvotePost(owner:address,liked_addr:address, postId: u64) acquires Pool {
     let contract_add:address = Creator_account;
     let pool:&mut Pool =borrow_global_mut<Pool>(contract_add);
     let storage:&mut Storage=simple_map::borrow_mut(&mut pool.universe, &liked_addr);
     let x: &mut User =vector::borrow_mut(&mut storage.user, 0);
-    x.governancePool=x.governancePool+1;
     let postIndex:u64 = postId;
     let required_post:&mut Post=vector::borrow_mut(&mut storage.post,postId);
     let isliked:&mut SimpleMap<address,bool> = &mut required_post.liked;

@@ -29,7 +29,8 @@ struct ArtistTicketCollection has key, store, drop,copy {
     author:address,
     banner:String,
     artistName: String,
-    streamId: String,
+    streamKeyId: String,
+    eventID: String,
     }
 
 struct Artist has key, store,drop,copy{
@@ -45,6 +46,7 @@ struct UserTicketCollection has key, store,drop, copy{
     governanceTicket:u64,
     ticketList: vector<Ticket>,
     song_list: vector<Music>,
+    isArtist: bool,
     }
 
 struct Music has store, drop, key, copy {
@@ -62,6 +64,22 @@ struct Music has store, drop, key, copy {
     isVoted: bool,
 }
 
+struct VotingGenre has store, drop, key, copy {
+    // this struct will take total votes for all genres to decide which 
+    // genre is preferred by current user base. The votes will then be used as 
+    // weights to decide which genre to play next
+    // this will take place regularly. say once in 1 week
+    genreVotes: vector<u64>,
+    // we will go over all the songs, put them in the bucket of the 
+    // most voted genre and then play the song from that bucket
+    songBucket: SimpleMap<u64,vector<Music>> // this is genre mapping of songs
+
+
+
+}
+
+
+
 
 struct Storage has store ,key ,drop {
     artists: SimpleMap<address, Artist>,
@@ -70,6 +88,7 @@ struct Storage has store ,key ,drop {
     musicCollection: vector<Music>,
     a2m: SimpleMap<address, vector<Music>>,
     numArtists: u64,
+    voting_genre: VotingGenre,
     }
 
     const AUTHORIZATION_ERROR: u64 = 100;
@@ -90,6 +109,8 @@ struct Storage has store ,key ,drop {
     const INVALID_NUMBER_OF_TICKETS: u64 = 115;
     const TICKET_NOT_FOUND_IN_USER_COLLECTION: u64 = 116;
     const STORAGE_DOES_NOT_EXIST: u64 = 117;
+    const USER_ACCOUNT_DOES_NOT_EXIST: u64 = 118;
+    const NOT_ENOUGH_GOV_TOKENS: u64 = 119;
 
 const Creator_account: address = @pool;
 
@@ -97,6 +118,11 @@ const Creator_account: address = @pool;
 public fun init_storage(creator:&signer) {
     // check whether the correct account is calling the function
     assert!(signer::address_of(creator) == Creator_account && (!exists<Storage>(Creator_account))==true,AUTHORIZATION_ERROR);
+            let voting_genre: VotingGenre = VotingGenre {
+                genreVotes: vector<u64>[0,0,0,0],
+                songBucket: simple_map::create<u64, vector<Music>>(),
+            };
+            
             let storage = Storage {
                 artists: simple_map::create<address, Artist>(),
                 users: simple_map::create<address, UserTicketCollection>(),
@@ -104,11 +130,11 @@ public fun init_storage(creator:&signer) {
                 a2m: simple_map::create<address, vector<Music>>(),
                 musicCollection: vector::empty<Music>(),
                 numArtists: 0,
+                voting_genre: voting_genre,
             };
     move_to<Storage>(creator, storage);
 
     }
-
 
 
 public fun generateTID(artist_name: String, eventName: String): vector<u8> {
@@ -127,15 +153,25 @@ public fun createArtist(artist: &signer, artistName: String) acquires Storage{
     assert!(exists<Storage>(Creator_account)==true,STORAGE_DOES_NOT_EXIST);
 
     let storage:&mut Storage = borrow_global_mut<Storage>(Creator_account);
+
     // check whether the artist already exists
     let artist_exists = simple_map::contains_key(&storage.artists, &signer::address_of(artist));
     assert!(artist_exists == false, ARTIST_ALREADY_EXISTS);
+
+    // every arist first has to be registered as a user, 
+    // if not registered return error 
+    assert!(simple_map::contains_key(&storage.users, &signer::address_of(artist)) == true, USER_ACCOUNT_DOES_NOT_EXIST);
 
     let artist_obj = Artist {
         artistName: artistName,
         artistCollection: vector::empty<String>(),
         musicKey: signer::address_of(artist),
     };
+    // change isArtist in user collection to true
+    let user_collection: &mut UserTicketCollection = simple_map::borrow_mut(&mut storage.users, &signer::address_of(artist));
+    let isArtist = &mut user_collection.isArtist;
+    *isArtist = true;
+    simple_map::upsert(&mut storage.users,signer::address_of(artist),*user_collection);
     simple_map::add(&mut storage.artists, signer::address_of(artist), artist_obj);
     let a2m=&mut storage.a2m;
     let num = &mut storage.numArtists;
@@ -146,7 +182,7 @@ public fun createArtist(artist: &signer, artistName: String) acquires Storage{
 
 
 
-public fun createNewArtistCollection(a_Creator: &signer, eventName: String, price: u64, num_tickets: u64, startTime: u64, endTime: u64,banner:String, link: String, streamId: String) acquires Storage{
+public fun createNewArtistCollection(a_Creator: &signer, eventName: String, price: u64, num_tickets: u64, startTime: u64, endTime: u64,banner:String, link: String, streamKeyId: String, eventID: String) acquires Storage{
     // check whether storage exists
     assert!(exists<Storage>(Creator_account)==true,STORAGE_DOES_NOT_EXIST);
     
@@ -203,7 +239,8 @@ public fun createNewArtistCollection(a_Creator: &signer, eventName: String, pric
         author:signer::address_of(a_Creator),
         banner: banner,
         artistName: artist.artistName,
-        streamId: streamId,
+        streamKeyId: streamKeyId,
+        eventID: eventID,
     };
 
     // add artist collection to the storage
@@ -224,7 +261,8 @@ public fun createCollection_user(user: &signer, user_name: String) acquires Stor
         governanceTicket:0,
         ticketList: vector::empty<Ticket>(),
         song_list: vector::empty<Music>(),
-        userName: user_name
+        userName: user_name,
+        isArtist: false,
     };
     simple_map::add(&mut storage.users, signer::address_of(user), utc);
     }
@@ -252,8 +290,7 @@ public fun TransferTicket(user: &signer, artist_addr: address, eventName: String
     vector::remove(&mut artistCollection.ticketList, ticketId);
     }
      
-// the owner can burn the ticket after start of the event, but before the end of the event
-// it will receive 25 governance token for this action 
+
 public fun burn(user: &signer, eventName: String, ticketId: u64) acquires Storage {
     // check whether storage exists
      assert!(exists<Storage>(Creator_account)==true,STORAGE_DOES_NOT_EXIST);
@@ -305,7 +342,7 @@ public fun add_music(creator:&signer , title:String, thumbnail:String , album:St
     let artist:&mut Artist=simple_map::borrow_mut(&mut storage.artists, &artist_addr);
     let music_vector=simple_map::borrow_mut(a2m,&signer::address_of(creator));
     let music_key= signer::address_of(creator);
-    let id=vector::length(music_vector);
+    let id=vector::length(musicList);
     let music:Music = Music{
         id:id,
         title:title,
@@ -353,4 +390,51 @@ public fun transfer_music(user:&signer,artist: address, music_id:u64,genre_id:u6
     apt_transfer::ms_trans(user,artist, music.price);
     }
 
+public fun removeArtistTicketCollection(artist:&signer, eventName: String) acquires Storage{
+    // check whether storage exists
+     assert!(exists<Storage>(Creator_account)==true,STORAGE_DOES_NOT_EXIST);
+    
+    let storage:&mut Storage = borrow_global_mut<Storage>(Creator_account);
+    // check whether the artist already exists
+    let artist_exists = simple_map::contains_key(&storage.artists, &signer::address_of(artist));
+    assert!(artist_exists == true, ARTIST_DOES_NOT_EXIST);
+    let artistCollection: &mut ArtistTicketCollection = simple_map::borrow_mut(&mut storage.eventCollection, &eventName);
+    let artistCollection_author = &mut artistCollection.author;
+    assert!(signer::address_of(artist) == *artistCollection_author, AUTHORIZATION_ERROR);
+    simple_map::remove(&mut storage.eventCollection, &eventName);
+    let artist:&mut Artist=simple_map::borrow_mut(&mut storage.artists, &signer::address_of(artist));
+    let artist_collection = &mut artist.artistCollection;
+    let i = 0;
+    let found: bool = false;
+    let len = vector::length(artist_collection);
+    while (i < len) {
+        let event = vector::borrow(artist_collection, i);
+        if (*event == eventName) {
+            vector::remove(artist_collection, i);
+            return
+        };
+        i = i + 1;
+    };
+    assert!(found == true, ARTIST_COLLECTION_DOES_NOT_EXIST);
+    }
+
+
+// this function will be called by the user to vote for the genre in voting_genre struct
+// the user can vote for genres depending on the number of governance tokens he has
+public fun vote_genre(user:&signer, genre_id:u64, tokens: u64) acquires Storage {
+    // check whether storage exists
+    assert!(exists<Storage>(Creator_account)==true,STORAGE_DOES_NOT_EXIST);
+    
+    let storage:&mut Storage=borrow_global_mut<Storage>(Creator_account);
+    let users = &mut storage.users;
+    let user_collection = simple_map::borrow_mut(users,&signer::address_of(user));
+    let governanceTicket = &mut user_collection.governanceTicket;
+    assert!(tokens <= *governanceTicket, NOT_ENOUGH_GOV_TOKENS);
+    let voting_genre = &mut storage.voting_genre;
+    let genre_votes = &mut voting_genre.genreVotes;
+    let genre = vector::borrow_mut(genre_votes,genre_id);
+    *genre = *genre + tokens;
+    *governanceTicket = *governanceTicket - tokens;
+    simple_map::upsert(users,signer::address_of(user),*user_collection);
+    }
 }

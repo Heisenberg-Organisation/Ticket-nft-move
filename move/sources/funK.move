@@ -34,8 +34,8 @@ public entry fun create_artist(artist: &signer,artist_name:String)  {
 }
 
 
-public entry fun artist_collection(artist: &signer, event_name: String, price: u64, num_tickets: u64, start_time: u64, end_time: u64,banner:String, link:String, streamId: String)  {
-    artist_marketplace::createNewArtistCollection(artist, event_name, price, num_tickets, start_time, end_time,banner, link, streamId)  
+public entry fun artist_collection(artist: &signer, event_name: String, price: u64, num_tickets: u64, start_time: u64, end_time: u64,banner:String, link:String, streamKeyId: String, eventID: String)  {
+    artist_marketplace::createNewArtistCollection(artist, event_name, price, num_tickets, start_time, end_time,banner, link, streamKeyId, eventID)  
 }
 
 
@@ -60,44 +60,15 @@ public entry fun transfer_music(user: &signer, artist_addr: address, music_id: u
     artist_marketplace::transfer_music(user, artist_addr, music_id, genre_id)
 }
 
-
+public entry fun burn_ticket(user: &signer, eventName: String, ticketId: u64){
+    artist_marketplace::burn(user, eventName, ticketId)
 }
 
+public entry fun vote_genre(user: &signer, genre_id: u64, tokens:u64) {
+    artist_marketplace::vote_genre(user,genre_id,tokens)
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+public entry fun remove_artist_collection(artist: &signer, event_name: String) {
+    artist_marketplace::removeArtistTicketCollection(artist, event_name)
+}
+}
