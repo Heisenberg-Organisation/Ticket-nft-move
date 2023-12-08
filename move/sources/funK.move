@@ -3,9 +3,6 @@ module pool::funK {
     use std::string::String; 
     use pool::Pool;
     use pool::artist_marketplace;
-    use std::vector;
-    use pool::Music;
-
 
 struct Stor has key,store{
     univ:vector<Pool::Storage>,
@@ -37,13 +34,13 @@ public entry fun create_artist(artist: &signer,artist_name:String)  {
 }
 
 
-public entry fun artist_collection(artist: &signer, event_name: String, price: u64, num_tickets: u64, start_time: u64, end_time: u64,banner:String, link:String)  {
-    artist_marketplace::createNewArtistCollection(artist, event_name, price, num_tickets, start_time, end_time,banner, link)  
+public entry fun artist_collection(artist: &signer, event_name: String, price: u64, num_tickets: u64, start_time: u64, end_time: u64,banner:String, link:String, streamId: String)  {
+    artist_marketplace::createNewArtistCollection(artist, event_name, price, num_tickets, start_time, end_time,banner, link, streamId)  
 }
 
 
-public entry fun create_user(user: &signer)  {
-    artist_marketplace::createCollection_user(user)   
+public entry fun create_user(user: &signer, user_name: String)  {
+    artist_marketplace::createCollection_user(user, user_name)   
 }
 
 
@@ -55,38 +52,16 @@ public entry fun init_storage(creator:&signer){
     artist_marketplace::init_storage(creator)
 }
 
-
-// public entry fun transfer_ticket_u2u(giver:address,taker:&signer,price:u64,ticket_id:u64){
-//     artist_marketplace::u2u(taker,giver,price,ticket_id)
-// }
-
-
-// public entry fun setforsale(artist:&signer,event:String){
-//     artist_marketplace::setforsale(artist,event);
-// }
-
-public entry fun init_music_storage(owner:&signer){
-    Music::init(owner)
+public entry fun addMusic(owner:&signer , title: String, thumbnail: String, album: String, duration: u64, dateUploaded: u64, hash: String, price: u64){
+    artist_marketplace::add_music(owner, title, thumbnail, album, duration, dateUploaded, hash, price)
 }
 
-public entry fun create_music_user(owner:&signer){
-    Music::create_user(owner)
-}
-
-public entry fun add_music(owner:&signer , hash:String , price:u64){
-    Music::add_music(owner,hash,price)
-}
-
-public entry fun music_tranfer_u2u(owner:&signer,to:address,id:u64){
-    Music::Tranfer(owner,to,id)
+public entry fun transfer_music(user: &signer, artist_addr: address, music_id: u64, genre_id: u64){
+    artist_marketplace::transfer_music(user, artist_addr, music_id, genre_id)
 }
 
 
-        
 }
-
-
-
 
 
 

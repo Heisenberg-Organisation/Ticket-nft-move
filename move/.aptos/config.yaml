@@ -1,14 +1,8 @@
 ---
 profiles:
-  admin:
-    private_key: "0x7d63f3733c0b8e3ab25b446eefdb0ea46695c80125339feabe6b8cb4c11164b0"
-    public_key: "0xf0ecba14f765afef6f83616bdabfcdf4b7f37c0a8ada3fc38dcbb78082665e4a"
-    account: 2ece7144040221742cbcf6111387d58c03b7157eef7f3a672a4e7219febd0a31
-    rest_url: "https://fullnode.testnet.aptoslabs.com"
-    faucet_url: "https://faucet.testnet.aptoslabs.com"
   default:
-    private_key: "0xd6e2043276ed6f1d020792e500db9f718903321e9f9b6a584718dae1e35df78f"
-    public_key: "0xf3ac8c09bf3100b1fe1c70635f80fadc4ccfe390d68c829fa60c2d7bcc131d00"
-    account: 6a2713e6fc577763fc77dd88a3900b502e845a84a16e0051f7d097c44ba6daaf
+    private_key: "0xee8248cc9b7c612e4ad0a376b888fa667f2666df0d1dfb182b113c16fccf5e73"
+    public_key: "0x61dabaacd98f8fd140fc9ea30be56d8b90e51974592b62e040c09834ad2d8795"
+    account: 9aa7f8471b4698b4955a63813403bb7f61789a52633b2d7415fcd2998d0fa024
     rest_url: "https://fullnode.testnet.aptoslabs.com"
     faucet_url: "https://faucet.testnet.aptoslabs.com"

@@ -2,11 +2,8 @@ module pool::Pool{
 
     use std::vector;
     use std::signer;
-    use std::string::String; 
-    use std::string;
+    use std::string::String;
     use aptos_std::simple_map::{Self, SimpleMap};
-    use pool::artist_marketplace;
-  
     
 struct User has store,drop,copy {
     upvotesTotal: u32,
@@ -43,7 +40,7 @@ struct Pool has key,copy{
 }
 
 
-const Creator_account: address = @0x28a94ba89b8637a6166d660ce089d37cf33e8ded7a9a5cdfd7b061453cd46797;
+const Creator_account: address = @pool;
 
 
 public fun init():Storage{   
@@ -129,21 +126,37 @@ public fun upvotePost(owner:address, liked_addr:address,postId:u64) acquires Poo
 
     if(*simple_map::borrow(isliked,&owner)==false){
         simple_map::upsert(isliked,owner,true);
-    if (*simple_map::borrow(isdisliked,&owner)==true){
-        simple_map::upsert(isdisliked,owner,false);
-        if (postIndex <= vector::length(&storage.post)) {
-        let post: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
-        post.downvotes = post.downvotes - 1;
-        x.downvotesTotal = x.downvotesTotal - 1;
-    }};
-    if (postIndex <= vector::length(&storage.post)){
-        let postIndex:u64 = postId;
-        let post: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
-        post.upvotes = post.upvotes + 1;
-        x.upvotesTotal = x.upvotesTotal + 1;
-        let borrowed_storage=*storage;
-        simple_map::upsert(&mut pool.universe,liked_addr,borrowed_storage);
-    }}}
+        if (*simple_map::borrow(isdisliked,&owner)==true){
+            simple_map::upsert(isdisliked,owner,false);
+            if (postIndex <= vector::length(&storage.post)) {
+                let post: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
+                if (post.downvotes > 0) {
+                    post.downvotes = post.downvotes - 1;
+                    x.downvotesTotal = x.downvotesTotal - 1;
+                }
+            }
+        };
+        if (postIndex <= vector::length(&storage.post)){
+            let post: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
+            post.upvotes = post.upvotes + 1;
+            x.upvotesTotal = x.upvotesTotal + 1;
+        }
+    }
+    else {
+        if (*simple_map::borrow(isliked,&owner)==true){
+            simple_map::upsert(isliked,owner,false);
+            if (postIndex <= vector::length(&storage.post)) {
+                let post: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
+                if (post.upvotes > 0){
+                    post.upvotes = post.upvotes - 1;
+                    x.upvotesTotal = x.upvotesTotal - 1;
+                }
+            }
+        }
+    };
+    let borrowed_storage=*storage;
+    simple_map::upsert(&mut pool.universe,liked_addr,borrowed_storage);
+}
 
 
 
@@ -165,18 +178,35 @@ public fun downvotePost(owner:address,liked_addr:address, postId: u64) acquires 
 
     if(*simple_map::borrow(isdisliked,&owner)==false ){
         simple_map::upsert(isdisliked,owner,true);
-    if (*simple_map::borrow(isliked,&owner)==true){
-        simple_map::upsert(isliked,owner,false);
+        if (*simple_map::borrow(isliked,&owner)==true){
+            simple_map::upsert(isliked,owner,false);
+            if (postIndex <= vector::length(&storage.post)) {
+                let post: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
+                if (post.upvotes > 0) {
+                    post.upvotes=post.upvotes - 1 ;
+                    x.upvotesTotal = x.upvotesTotal - 1;
+                }
+            }
+        };
         if (postIndex <= vector::length(&storage.post)) {
-        let post: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
-        post.upvotes=post.upvotes - 1 ;
-        x.upvotesTotal = x.upvotesTotal - 1;
-    }};
-    if (postIndex <= vector::length(&storage.post)) {
-        let post: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
-        post.downvotes = post.downvotes + 1;
-        x.downvotesTotal = x.downvotesTotal + 1;
-        let borrowed_storage=*storage;
-        simple_map::upsert(&mut pool.universe,liked_addr,borrowed_storage);
-
-}}}}
+            let post: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
+            post.downvotes = post.downvotes + 1;
+            x.downvotesTotal = x.downvotesTotal + 1;
+        }
+    }
+    else {
+        if (*simple_map::borrow(isdisliked,&owner)==true){
+            simple_map::upsert(isdisliked,owner,false);
+            if (postIndex <= vector::length(&storage.post)) {
+                let post: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
+                if (post.downvotes > 0) {
+                    post.downvotes = post.downvotes - 1;
+                    x.downvotesTotal = x.downvotesTotal - 1;
+                }
+            }
+        }
+    };
+    let borrowed_storage=*storage;
+    simple_map::upsert(&mut pool.universe,liked_addr,borrowed_storage);
+}
+}

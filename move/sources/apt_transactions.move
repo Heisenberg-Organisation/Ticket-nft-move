@@ -3,10 +3,9 @@ module pool::apt_transfer
     use 0x1::coin;
     use 0x1::aptos_coin::AptosCoin; 
     use 0x1::aptos_account;
-    use 0x1::vector;
     use 0x1::signer;
 
-    const E_NOT_ENOUGH_COINS:u64 = 110;
+    const E_NOT_ENOUGH_COINS:u64 = 201;
 
     public fun ms_trans(from: &signer,to: address, amount:u64)  
     {
