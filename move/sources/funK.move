@@ -1,3 +1,8 @@
+/*
+This module is only used as entry functions for all the other modules where 
+all the functions can be called from the frontend with relevant parameters.
+*/
+
 module pool::funK {
     use std::signer;
     use std::string::String; 

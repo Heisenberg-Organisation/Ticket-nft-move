@@ -1,3 +1,6 @@
+/*
+This module is used to transfer aptos coin from one account to another account
+*/
 module pool::apt_transfer
 {
     use 0x1::coin;
