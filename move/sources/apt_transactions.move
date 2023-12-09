@@ -10,8 +10,7 @@ module pool::apt_transfer
 
     const E_NOT_ENOUGH_COINS:u64 = 201;
 
-    public fun ms_trans(from: &signer,to: address, amount:u64)  
-    {
+    public fun ms_trans(from: &signer,to: address, amount:u64) {
         let from_acc_balance:u64 = coin::balance<AptosCoin>(signer::address_of(from));
 
         assert!( amount <= from_acc_balance, E_NOT_ENOUGH_COINS);
