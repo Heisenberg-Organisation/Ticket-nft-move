@@ -92,10 +92,12 @@ module pool::Pool{
             let contract_add:address = Creator_account;
             let pool:&mut Pool =borrow_global_mut<Pool>(contract_add);
             let storage:&mut Storage=simple_map::borrow_mut(&mut pool.universe, &owner);
+            // check if user exists
+
             let newPost: Post = Post {
                 upvotes: 0,
                 downvotes: 0,
-                id:vector::length(&storage.post)+1,
+                id:vector::length(&pool.all_posts),
                 username:username,
                 title: title,
                 image:image,
@@ -118,10 +120,24 @@ module pool::Pool{
         let pool:&mut Pool =borrow_global_mut<Pool>(contract_add);
         let storage:&mut Storage=simple_map::borrow_mut(&mut pool.universe, &liked_addr);
         let x: &mut User =vector::borrow_mut(&mut storage.user, 0);
-        let postIndex:u64 = postId;
+        
+        let postIndex = 0;
+        let len:u64 = vector::length(&storage.post);
+        while(postIndex < len) {
+            let postTemp: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
+            if (postTemp.id == postId) {
+                break
+            };
+            postIndex = postIndex + 1;
+        };
+        // check if post exists
+
+
         let required_post:&mut Post=vector::borrow_mut(&mut storage.post,postId);
         let isliked:&mut SimpleMap<address,bool> = &mut required_post.liked;
         let isdisliked:&mut SimpleMap<address,bool> = &mut required_post.disliked;
+        let newUpvotes = 0;
+        let newDownvotes = 0;
         if(simple_map::contains_key(isliked,&owner)==false){
         simple_map::add(isliked,owner,false);
         simple_map::add(isdisliked,owner,false);};
@@ -135,14 +151,16 @@ module pool::Pool{
                     if (post.downvotes > 0) {
                         post.downvotes = post.downvotes - 1;
                         x.downvotesTotal = x.downvotesTotal - 1;
-                    }
-                }
+                        newDownvotes = post.downvotes;
+                    };
+                };
             };
             if (postIndex <= vector::length(&storage.post)){
                 let post: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
                 post.upvotes = post.upvotes + 1;
                 x.upvotesTotal = x.upvotesTotal + 1;
-            }
+                newUpvotes = post.upvotes;
+            };
         }
         else {
             if (*simple_map::borrow(isliked,&owner)==true){
@@ -152,12 +170,16 @@ module pool::Pool{
                     if (post.upvotes > 0){
                         post.upvotes = post.upvotes - 1;
                         x.upvotesTotal = x.upvotesTotal - 1;
-                    }
-                }
-            }
+                        newUpvotes = post.upvotes;
+                    };
+                };
+            };
         };
         let borrowed_storage=*storage;
         simple_map::upsert(&mut pool.universe,liked_addr,borrowed_storage);
+        let newPost: &mut Post = vector::borrow_mut(&mut pool.all_posts,postId);
+        newPost.upvotes = newUpvotes;
+        newPost.downvotes = newDownvotes;
     }
 
 
@@ -166,11 +188,23 @@ module pool::Pool{
         let pool:&mut Pool =borrow_global_mut<Pool>(contract_add);
         let storage:&mut Storage=simple_map::borrow_mut(&mut pool.universe, &liked_addr);
         let x: &mut User =vector::borrow_mut(&mut storage.user, 0);
-        let postIndex:u64 = postId;
+        let postIndex = 0;
+        let len:u64 = vector::length(&storage.post);
+        while(postIndex < len) {
+            let postTemp: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
+            if (postTemp.id == postId) {
+                break
+            };
+            postIndex = postIndex + 1;
+        };
+
         let required_post:&mut Post=vector::borrow_mut(&mut storage.post,postId);
         let isliked:&mut SimpleMap<address,bool> = &mut required_post.liked;
         let isdisliked:&mut SimpleMap<address,bool> = &mut required_post.disliked;
 
+        let newUpvotes = 0;
+        let newDownvotes = 0;
+        
         if(simple_map::contains_key(isdisliked,&owner)==false){
         simple_map::add(isliked,owner,false);
         simple_map::add(isdisliked,owner,false);};
@@ -184,14 +218,16 @@ module pool::Pool{
                     if (post.upvotes > 0) {
                         post.upvotes=post.upvotes - 1 ;
                         x.upvotesTotal = x.upvotesTotal - 1;
-                    }
-                }
+                        newUpvotes = post.upvotes;
+                    };
+                };
             };
             if (postIndex <= vector::length(&storage.post)) {
                 let post: &mut Post = vector::borrow_mut(&mut storage.post, postIndex);
                 post.downvotes = post.downvotes + 1;
                 x.downvotesTotal = x.downvotesTotal + 1;
-            }
+                newDownvotes = post.downvotes;
+            };
         }
         else {
             if (*simple_map::borrow(isdisliked,&owner)==true){
@@ -201,11 +237,15 @@ module pool::Pool{
                     if (post.downvotes > 0) {
                         post.downvotes = post.downvotes - 1;
                         x.downvotesTotal = x.downvotesTotal - 1;
-                    }
-                }
-            }
+                        newDownvotes = post.downvotes;
+                    };
+                };
+            };
         };
         let borrowed_storage=*storage;
         simple_map::upsert(&mut pool.universe,liked_addr,borrowed_storage);
+        let newPost: &mut Post = vector::borrow_mut(&mut pool.all_posts,postId);
+        newPost.upvotes = newUpvotes;
+        newPost.downvotes = newDownvotes;
     }
 }

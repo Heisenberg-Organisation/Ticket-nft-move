@@ -4,7 +4,7 @@ version = "1.0.0"
 authors = []
 
 [addresses]
-pool="0x81621ab2b6cf09b7195b6ddec510a0829ed0a3e60f77dac2fd4fd1a4e8f8bd5e"
+pool="0xa3d1f36631889d1dd502b2db35a5649c7b73ee7edf0a446ea397396b2e038d19"
 
 [dev-addresses]
 
