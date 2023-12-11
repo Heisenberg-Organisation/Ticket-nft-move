@@ -38,7 +38,6 @@ When the Dapp makes an RPC request to the snap, it derives the key pair from met
 
 ## Features overview
 
-//artist user flowchart here
 <img width="100%" alt="image" src="https://github.com/Heisenberg-Organisation/images/blob/main/User_Artist.png">
 
 
@@ -48,7 +47,6 @@ A virtual studio for Indie artists where they can create and manage their music 
 Artist can upload music which can be stored as a music NFT via IPFS protocol The artist can also create and schedule a live concert and our smart contract will then mint and sell Air tickets to the users. Clicking the create event button, the artist will get the stream key and server URL which can be used to stream using streaming software such as OBS.
 Artist get real time revenue as user purchase their tickets.
 
-// studio ss
 <img width="100%" alt="image" src="https://github.com/Heisenberg-Organisation/images/blob/main/STUDIO.png">
 
 ### Aptos Connect
