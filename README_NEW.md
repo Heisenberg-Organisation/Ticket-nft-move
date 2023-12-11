@@ -33,7 +33,7 @@
       </ul>
     </li> -->
     <li><a href="#about-the-project">About The Project</a></li>
-    <li><a href="#installation-instructions">Installation Instructions</a></li>
+    <li><a href="#local-installation-instructions">Local Installation Instructions</a></li>
     <!-- <li><a href="#project-structure">Project Structure</a></li> -->
     <li><a href="#getting-started">Getting Started</a></li>
     <li><a href="#setting-context">Setting Context</a></li>
@@ -57,7 +57,26 @@ We have used **Aptos snaps** as the infrastructure provider and we have develope
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-## Installation Instructions
+## Local Installation Instructions
+
+> [!NOTE]
+> Use [Metamask Flask](https://metamask.io/flask/) for full snap support.
+
+1. Install the dependencies using the command below:
+   ```sh
+   ./setup.sh
+   ```
+2. Open two terminal windows / split panes and start snap and site separately, as shown below:<br>
+   To start the site:
+   ```sh
+   cd site
+   PORT=8000 npm run start
+   ```
+   To start the snap:
+   ```sh
+   cd snap
+   yarn start:snap
+   ```
 
 <!-- fill here -->
 
