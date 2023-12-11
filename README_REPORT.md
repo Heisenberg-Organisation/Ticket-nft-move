@@ -78,7 +78,6 @@ We have used 4 different modules. One file is designated for the artist marketpl
 Detailed explanation of each function and structs can be found in // link readme of smart contract
 
 ## Technical Architecture
-
 <img width="100%" alt="image" src="https://gist.github.com/assets/59790120/c1744af7-0ceb-475a-b55a-89ed48f8a92a">
 
 ### IPFS
