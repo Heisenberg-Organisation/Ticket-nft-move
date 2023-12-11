@@ -303,10 +303,6 @@ module pool::artist_marketplace {
         let user_exists = simple_map::contains_key(&storage.users, &signer::address_of(user));
         assert!(user_exists == true, USER_ACCOUNT_DOES_NOT_EXIST);
 
-        // check whether the artist collection exists
-        let found: bool = simple_map::contains_key(&storage.eventCollection, &eventName);
-        // assert!(found == true, ARTIST_COLLECTION_DOES_NOT_EXIST);
-
         let artistCollection: &mut ArtistTicketCollection = simple_map::borrow_mut(&mut storage.eventCollection, &eventName);
         
         // find the ticket in the user collection
@@ -421,6 +417,7 @@ module pool::artist_marketplace {
         let i = 0;
         let found: bool = false;
         let len = vector::length(artist_collection);
+        // remove the artist collection from the artist collection vector
         while (i < len) {
             let event = vector::borrow(artist_collection, i);
             if (*event == eventName) {
@@ -444,6 +441,7 @@ module pool::artist_marketplace {
         let voting_genre = &mut storage.voting_genre;
         let genre_votes = &mut voting_genre.genreVotes;
         let genre = vector::borrow_mut(genre_votes,genre_id);
+        //register vote in the genre
         *genre = *genre + tokens;
         *governanceTicket = *governanceTicket - tokens;
         simple_map::upsert(users,signer::address_of(user),*user_collection);
