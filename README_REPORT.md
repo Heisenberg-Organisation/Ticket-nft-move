@@ -43,6 +43,7 @@ When the Dapp makes an RPC request to the snap, it derives the key pair from met
 
 ## Features overview
 
+![img](https://0x0.st/H3J1.jpg)
 <img width="100%" alt="image" src="https://github.com/Heisenberg-Organisation/images/blob/main/User_Artist.png">
 
 
