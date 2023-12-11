@@ -2,7 +2,13 @@
 
 Move smart contract comprises four distinct files, each dedicated to a specific functionality. One file is designated for the artist marketplace (artist.move), another for social media (pool.move), a third for aptos transactions (apt_transactions.move), and the last file (funK.move) serves as the orchestrator, calling functions from each module.
 
-...................................................................................................................................................
+## Compile and Publish Instructions
+
+```shell
+aptos move compile --named-addresses pool=<address>
+aptos move publish --named-addresses pool=<address>
+```
+***
 
 ## Social Media (Pool.move)
 
