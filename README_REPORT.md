@@ -24,6 +24,11 @@ These are the instructions for running the Arkadia locally:
 
 ## Getting Started (Login Steps)
 
+Follow the steps in the given order
+1. Click on "CONNECT WALLET" to connect wallet through Metamask.
+2. Then a user needs to be registered to initiate post interaction, buy songs and concert tickets, and view live concerts.
+3. Artist registerations to create concerts and sell their music.
+
 ## Setting Context
 
 Most of the web2 traffic is composed of social media, content creation, gaming, and payments. These services have been built over the last 2 decades, using key “enablers” for developers. We can see the trends in no-code websites and AI integrations. Our team believes that reducing the barrier to web3 dapp development will provide a boost to the ecosystem. As we build for the next 100 million users on web3, it is key to provide these enablers to empower developers at every step. Aptos serves as a perfect base layer for bringing these web2 services to the decentralized web3 arena
