@@ -49,7 +49,7 @@ Artist can upload music which can be stored as a music NFT via IPFS protocol The
 Artist get real time revenue as user purchase their tickets.
 
 // studio ss
-
+<img width="100%" alt="image" src="https://github.com/Heisenberg-Organisation/images/blob/main/STUDIO.png">
 
 ### Aptos Connect
 
