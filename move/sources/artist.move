@@ -274,6 +274,9 @@ module pool::artist_marketplace {
         let artistCollection: &mut ArtistTicketCollection = simple_map::borrow_mut(&mut storage.eventCollection, &eventName);
         assert!(artistCollection.maxTickets>0,ARTIST_COLLECTION_SOLD_OUT);
 
+        let max_tickets = &mut artistCollection.maxTickets;
+        *max_tickets = *max_tickets - 1;
+
         artistCollection.maxTickets=artistCollection.maxTickets-1;
         let artist_tickets=&mut artistCollection.ticketList;
 
@@ -288,48 +291,47 @@ module pool::artist_marketplace {
         vector::push_back(user_tickets, ticket);
         simple_map::upsert(&mut storage.eventCollection, eventName, *artistCollection);
         simple_map::upsert(&mut storage.users,signer::address_of(user),*users_collection);
+        
     }
      
-
     public fun burn(user: &signer, eventName: String, ticketId: u64) acquires Storage {
         // check whether storage exists
         assert!(exists<Storage>(Creator_account)==true,STORAGE_DOES_NOT_EXIST);
         
         let storage:&mut Storage = borrow_global_mut<Storage>(Creator_account);
-        // check whether user exists
+        // check whether the user already exists
         let user_exists = simple_map::contains_key(&storage.users, &signer::address_of(user));
         assert!(user_exists == true, USER_ACCOUNT_DOES_NOT_EXIST);
 
-        // fetch the ticket from the user collection matching the ticketId and the eventName
+        // check whether the artist collection exists
+        let found: bool = simple_map::contains_key(&storage.eventCollection, &eventName);
+        // assert!(found == true, ARTIST_COLLECTION_DOES_NOT_EXIST);
+
+        let artistCollection: &mut ArtistTicketCollection = simple_map::borrow_mut(&mut storage.eventCollection, &eventName);
+        
+        // find the ticket in the user collection
+        let i = 0;
         let user_collection: &mut UserTicketCollection = simple_map::borrow_mut(&mut storage.users, &signer::address_of(user));
         let user_tickets:&mut vector<Ticket> = &mut user_collection.ticketList;
-
-        let i = 0;
-        let found: bool = false;
         let len = vector::length(user_tickets);
+        let found: bool = false;
         while (i < len) {
             let ticket = vector::borrow_mut(user_tickets, i);
-            if (ticket.eventId == eventName && ticket.ticketId == ticketId) {
-                // check whether the event has started
-                let artistCollection: &mut ArtistTicketCollection = simple_map::borrow_mut(&mut storage.eventCollection, &eventName);
-                let current_time = timestamp::now_seconds();
-                assert!(current_time < artistCollection.startTime, EVENT_NOT_STARTED);
-                // check whether the event has ended
-                assert!(current_time > artistCollection.endTime, EVENT_ENDED);
-                // burn the ticket
+            if (ticket.eventId == eventName) {
+                found = true;
+                // assert!(artistCollection.startTime > timestamp::now_seconds(), EVENT_NOT_STARTED);
+                // assert!(artistCollection.endTime < timestamp::now_seconds(), EVENT_ENDED);
                 vector::remove(user_tickets, i);
-                // transfer 25 governance tokens to the user
+                // transfer the governance tokens
                 let governanceTicket = &mut user_collection.governanceTicket;
-                // give governance token to user equal to price of the music
                 *governanceTicket = *governanceTicket + artistCollection.price;
-                simple_map::upsert(&mut storage.users,signer::address_of(user),*user_collection);
-                return
+                break
             };
             i = i + 1;
         };
         assert!(found == true, TICKET_NOT_FOUND_IN_USER_COLLECTION);
+        simple_map::upsert(&mut storage.users,signer::address_of(user),*user_collection);
     }
-
 
     public fun add_music(creator:&signer , title:String, thumbnail:String , album:String , duration:u64 ,dateUploaded:u64, hash:String , price:u64) acquires Storage{
         // check whether storage exists
@@ -368,41 +370,53 @@ module pool::artist_marketplace {
         simple_map::upsert(a2m,music_key,*music_vector);
     }
 
-
     public fun transfer_music(user:&signer,artist: address, music_id:u64,genre_id:u64) acquires Storage{
         // check whether storage exists
         assert!(exists<Storage>(Creator_account)==true,STORAGE_DOES_NOT_EXIST);
 
-        // artist cannot purchase their own music
+        // check whether the artist already exists
         assert!(artist != signer::address_of(user), ARTIST_CANNOT_BE_BUYER);
-        
+
         let storage:&mut Storage=borrow_global_mut<Storage>(Creator_account);
         let a2m=&mut storage.a2m;
         let users = &mut storage.users;
         let user_music_vector= simple_map::borrow_mut(users,&signer::address_of(user));
         let song_list=&mut user_music_vector.song_list;
         let music_vector_artist = simple_map::borrow_mut(a2m,&artist);
-        let music_addr_artist = vector::borrow_mut(music_vector_artist,music_id);
-
-        // check whether the user already has the song in its collection
-        let user_has_song = vector::contains(song_list, music_addr_artist);
-        assert!(user_has_song == false, USER_ALREADY_HAS_SONG);
-
+        
+        // check whether the user already has the song
+        let i = 0;
+        let user_has_song = false;
+        let len = vector::length(song_list);
+        while (i < len) {
+            let music = vector::borrow(song_list, i);
+            if (music.id == music_id) {
+                user_has_song = true;
+                assert!(user_has_song == false, USER_ALREADY_HAS_SONG);
+                break
+            };
+            i = i + 1;
+        };
+        let music_list_complete = &mut storage.musicCollection;
+        let music_addr_artist = vector::borrow_mut(music_list_complete,music_id);
+        
         let genre_vector = &mut music_addr_artist.genre;
         let genre = vector::borrow_mut(genre_vector,genre_id);
         *genre=*genre + 1;
-        let music=music_addr_artist;    
+        let music=music_addr_artist;  
+  
         vector::push_back(song_list,*music);
         let num_user_songs = vector::length(song_list);
         let music_copy = vector::borrow_mut(song_list,num_user_songs-1);
         let isVoted = &mut music_copy.isVoted;
         *isVoted = true;
+        apt_transfer::ms_trans(user,artist, music.price);
 
         // give governance token to user equal to price of the music
         let governanceTicket = &mut user_music_vector.governanceTicket;
         *governanceTicket = *governanceTicket + music.price;
         simple_map::upsert(users,signer::address_of(user),*user_music_vector);
-        apt_transfer::ms_trans(user,artist, music.price);
+        simple_map::upsert(a2m,artist,*music_vector_artist);
     }
 
     public fun removeArtistTicketCollection(artist:&signer, eventName: String) acquires Storage{
