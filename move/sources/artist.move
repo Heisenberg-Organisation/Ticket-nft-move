@@ -319,8 +319,6 @@ module pool::artist_marketplace {
             let ticket = vector::borrow_mut(user_tickets, i);
             if (ticket.eventId == eventName) {
                 found = true;
-                // assert!(artistCollection.startTime > timestamp::now_seconds(), EVENT_NOT_STARTED);
-                // assert!(artistCollection.endTime < timestamp::now_seconds(), EVENT_ENDED);
                 vector::remove(user_tickets, i);
                 // transfer the governance tokens
                 let governanceTicket = &mut user_collection.governanceTicket;
@@ -384,19 +382,6 @@ module pool::artist_marketplace {
         let song_list=&mut user_music_vector.song_list;
         let music_vector_artist = simple_map::borrow_mut(a2m,&artist);
         
-        // check whether the user already has the song
-        let i = 0;
-        let user_has_song = false;
-        let len = vector::length(song_list);
-        while (i < len) {
-            let music = vector::borrow(song_list, i);
-            if (music.id == music_id) {
-                user_has_song = true;
-                assert!(user_has_song == false, USER_ALREADY_HAS_SONG);
-                break
-            };
-            i = i + 1;
-        };
         let music_list_complete = &mut storage.musicCollection;
         let music_addr_artist = vector::borrow_mut(music_list_complete,music_id);
         
