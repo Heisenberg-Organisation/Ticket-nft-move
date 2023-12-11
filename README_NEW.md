@@ -51,11 +51,6 @@
 
 ## About The Project
 
-<<<<<<< Updated upstream
-
-=======
-[![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid)
->>>>>>> Stashed changes
 In the dynamic transition from Web2 to Web3, Arkadia presents an interconnected network of apps, establishing an interoperable ecosystem that spans social, content, payments, and gaming domains for music artists and users, powered by the Aptos Snap. Built on the robust foundation of Aptos, our mission is to target the next 100 million users embracing Web3, breaking barriers, and providing cost-effective transactions at scale.
 
 We have used **Aptos snaps** as the infrastructure provider and we have developed an ecosystem around **On-Chain radio** as a use case to our snaps
@@ -131,11 +126,11 @@ Users will have an option to listen to the songs being randomly played on the Ra
 
 ### Smart Contracts
 
-The Metamask Snaps we have implemented invokes a method call to Aptos SDK which then triggers a method call in a smart contract. All the contracts deployed can be found in // move directory
+The Metamask Snaps we have implemented invokes a method call to Aptos SDK which then triggers a method call in a smart contract. All the contracts deployed can be found in [move directory](./smart-contracts/move/sources)
 
 We have used 4 different modules. One file is designated for the artist marketplace (artist.move), another for social media (pool.move), a third for aptos transactions (apt_transactions.move), and the last file (funK.move) serves as the orchestrator, calling functions from each module.
 
-Detailed explanation of each function and structs can be found in // link readme of smart contract
+Detailed explanation of each function and structs can be found in [readme of smart contract](./smart-contracts/move/README.md).
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
@@ -174,7 +169,7 @@ We propose the integration of HTTP Live Streaming (HLS) and the InterPlanetary F
 By doing so, we intend to enhance the accessibility of content by leveraging IPFS for distributed storage, thereby diminishing reliance on centralized servers. Additionally, our goal includes implementing adaptive streaming capabilities through HLS, enabling clients to dynamically adjust playback in response to varying network conditions.
 
 <p align="center">
-![img](https://0x0.st/H33s.png)
+<img src="https://0x0.st/H33s.png" height=700 />
 </p>
 
 The live streaming workflow initiates by sourcing a feed from an RTMP server, serving as the initial hub for receiving the video feed. Following this, the process employs FFmpeg for the transcoding of the RTMP stream into HLS chunks. Concurrently, inotifywait is utilized to monitor changes in the directory where HLS chunks are stored, subsequently triggering actions in the streaming pipeline. Upon the generation of HLS chunks, the corresponding hash is added to the IPFS network, ensuring unique content identification. Subsequently, the M3U8 file, functioning as an HLS manifest, is updated to reflect the newly generated hash, guaranteeing accurate content retrieval. The updated M3U8 file is then published, potentially through a web server, CDN, or other distribution mechanisms, making it accessible to clients. This entire workflow is continuously repeated throughout the live streaming session to ensure the maintenance of an updated stream on IPFS.
