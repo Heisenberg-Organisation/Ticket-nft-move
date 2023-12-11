@@ -49,7 +49,7 @@ Artist can upload music which can be stored as a music NFT via IPFS protocol The
 Artist get real time revenue as user purchase their tickets.
 
 // studio ss
-<img width="100%" alt="image" src="https://github.com/Heisenberg-Organisation/images/blob/main/IPFS.png">
+
 
 ### Aptos Connect
 
@@ -80,7 +80,7 @@ We have used 4 different modules. One file is designated for the artist marketpl
 Detailed explanation of each function and structs can be found in // link readme of smart contract
 
 ## Technical Architecture
-<img width="100%" alt="image" src="https://github.com/Heisenberg-Organisation/images/blob/main/IPFS.png">
+<img width="100%" alt="image" src="https://github.com/Heisenberg-Organisation/images/blob/main/tech_archi.png">
 
 
 ### IPFS
