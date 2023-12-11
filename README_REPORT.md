@@ -5,17 +5,18 @@
 // deployed link
 [![N|Solid]([https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid](https://cldup.com/dTxpPi9lDf.thumb.png)%5D(https://nodesource.com/products/nsolid))
 
-In the dynamic transition from Web2 to Web3, Arkadia presents an interconnected network of apps, establishing an interoperable ecosystem that spans social, content, payments, and gaming domains for music artists and users, powered by the Aptos Snap. Built on the robust foundation of Aptos, our mission is to target the next 100 million users embracing Web3, breaking barriers, and providing cost-effective transactions at scale.
+In the dynamic transition from Web2 to Web3, Arkadia presents an interconnected network of apps, establishing a compatible ecosystem that spans social, content, payments, and gaming domains for music artists and users, powered by the Aptos Snap. Built on the robust foundation of Aptos, our mission is to target the next 100 million users embracing Web3, breaking barriers, and providing cost-effective transactions at scale.
 
 We have used **Aptos snaps** as the infrastructure provider and we have developed an ecosystem around **On-Chain radio** as a use case to our snaps
 
 ## Contents
 
 1. Installation instructions
-2. Setting precedence
-3. The Aptos snap
-4. Features overview
-5. Technical architecture
+2. Getting Started (Login Steps)
+3. Setting precedence
+4. The Aptos snap
+5. Features overview
+6. Technical architecture
 
 ## Installation Instructions
 
@@ -40,17 +41,18 @@ When the Dapp makes an RPC request to the snap, it derives the key pair from met
 
 //artist user flowchart here
 
+
 ### Aptos Studio
 
 A virtual studio for Indie artists where they can create and manage their music and schedule live concerts.
 Artist can upload music which can be stored as a music NFT via IPFS protocol The artist can also create and schedule a live concert and our smart contract will then mint and sell Air tickets to the users. Clicking the create event button, the artist will get the stream key and server URL which can be used to stream using streaming software such as OBS.
 Artist get real time revenue as user purchase their tickets.
 
-/ss
+//screen shot of aptos studio here
 
 ### Aptos Connect
 
-Post interaction acts as a community building exercise for artists and users alike. Every interaction such as likes and post creation are recorded on chain as transactions. Aptos connect lets users buy tickets for upcoming events.
+Here post interaction acts as a community building exercise for artists and users alike. Every interaction such as likes and post creation are recorded on chain as transactions. Aptos connect lets users buy tickets for upcoming events.
 
 ### Aptos Live
 
@@ -60,11 +62,21 @@ You can enter the concerts using your purchased tickets. The concert arena has b
 
 Users can listen to the radio broadcast and purchase their favorite songs, tag them and save them in their private playlist.
 
-### Community Governance // edit
-
-Since, Aptos arkadia is a community driven platform, it allows users to propose changes or features in the protocol using the special ARK governance tokens. The governance token can be earned by participating and engaging with the community.
+### Community Governance
 
 Aptos Arkadia is proud to present itself as a community-driven ecosystem wherein users get ARK governance tokens for every interaction, specifically users are rewarded for purchasing music on Aptos Beats, attending live events, and posting content on Aptos Connect. These tokens can then be used to vote for upcoming features and proposing changes in the protocol. For the current prototype of Aptos Beats, users can vote on their favourite genres. This will determine the time each genre gets on the radio. However this may lead to artists publishing their songs under popular genres even if they are not of those genres. To avoid these practices, artists are not allowed to tag their songs but it is the users who buy the songs, who get the option to vote for the genre based on which their genre is decided.
+
+### Playlist curation
+
+Users will have an option to listen to the songs being randomly played on the Radio. However they have no control over the songs being played on the Radio. If they want to listen to the songs they like, they have an option to buy the songs for a price, upon which a method in smart contract will be triggered which will add the song to your playlist. Users have complete control over the playback of the songs in their playlist (like fast forwarding, rewinding, volume control, pause/play, etc)
+
+### Smart Contracts
+
+The Metamask Snaps we have implemented invokes a method call to Aptos SDK which then triggers a method call in a smart contract. All the contracts deployed can be found in // move directory
+
+We have used 4 different modules. One file is designated for the artist marketplace (artist.move), another for social media (pool.move), a third for aptos transactions (apt_transactions.move), and the last file (funK.move) serves as the orchestrator, calling functions from each module.
+
+Detailed explanation of each function and structs can be found in // link readme of smart contract
 
 ## Technical Architecture
 
@@ -84,6 +96,11 @@ Whenever Artist schedules an event, tickets are minted and made available for sa
 
 This has been developed using Unity Game engine with multiplayer support. The users have their characters spawned in the arena and they can move around interacting with other users. We have used the jslib for communication between the Unity (Arena) and React (Arkadia website). The users can only join the event from the Arkadia site itself. When they click on 'Join Event', users are redirected to the 3D arena, the playbackURL in the ticket is decrypted, and they can now enjoy the live stream and interact with other users for a more holistic experience.
 
+
+### Streaming
+
+We have implemented a server-side app that efficiently manages live streaming with AWS IVS. It initializes AWS IVS client, sets up an Express app for JSON requests, generates RSA keys for encryption, and handles CORS. API endpoints create, stop, and start streaming events, interacting seamlessly with AWS IVS via @aws-sdk/client-ivs. The app also integrates input from OBS (Open Broadcaster Software), a popular streaming tool. CORS headers aid cross-origin requests, and RSA encryption secures sensitive data like the playback URL. The app, on port 3000, provides clear instructions for event manipulation through API endpoints.
+
 ### Permissionless Streaming Protocol (beta)
 
 We propose the integration of HTTP Live Streaming (HLS) and the InterPlanetary File System (IPFS) to create a robust and decentralized live streaming solution. This proposal outlines a comprehensive workflow that seamlessly combines these technologies, providing efficient content delivery and improved accessibility. The integration involves key processes, including sourcing the feed, HLS chunk creation, IPFS content addition, M3U8 file updates, and continuous publishing to maintain a dynamic and updated live stream.
@@ -102,21 +119,6 @@ The live streaming workflow initiates by sourcing a feed from an RTMP server, se
 
 The proposed integration seamlessly combines RTMP, HLS, and IPFS for efficient and decentralized content delivery. It begins with the RTMP server receiving live video streams from OBS (a popular streaming software) and concurrently utilizes an HLS server to push content to the RTMP server, enabling adaptive streaming. The RTMP server then publishes the stream through both HLS and IPFS streaming mechanisms. For HLS, it communicates with the HLS server to generate playlists, while for IPFS, an IPFS server leverages FFmpeg to transcode the live stream, creating video segments and an M3U8 playlist. A mirror or IPFS pinning service enhances distribution and availability by storing HLS content on IPFS for extended periods, increasing redundancy.
 
-### Governance Implementation
-
-Aptos Arkadia is proud to present itself as a community-driven ecosystem wherein users get ARK governance tokens for every interaction, specifically users are rewarded for purchasing music on Aptos Beats, attending live events, and posting content on Aptos Connect. These tokens can then be used to vote for upcoming features and proposing changes in the protocol. For the current prototype of Aptos Beats, users can vote on their favourite genres. This will determine the time each genre gets on the radio. However this may lead to artists publishing their songs under popular genres even if they are not of those genres. To avoid these practices, artists are not allowed to tag their songs but it is the users who buy the songs, who get the option to vote for the genre based on which their genre is decided.
-
-### Playlist curation
-
-Users will have an option to listen to the songs being randomly played on the Radio. However they have no control over the songs being played on the Radio. If they want to listen to the songs they like, they have an option to buy the songs for a price, upon which a method in smart contract will be triggered which will add the song to your playlist. Users have complete control over the playback of the songs in their playlist (like fast forwarding, rewinding, volume control, pause/play, etc)
-
-### Smart Contracts
-
-The Metamask Snaps we have implemented invokes a method call to Aptos SDK which then triggers a method call in a smart contract. All the contracts deployed can be found in // move directory
-
-We have used 4 different modules. One file is designated for the artist marketplace (artist.move), another for social media (pool.move), a third for aptos transactions (apt_transactions.move), and the last file (funK.move) serves as the orchestrator, calling functions from each module.
-
-Detailed explanation of each function and structs can be found in // link readme of smart contract
 
 ## Features
 
