@@ -15,6 +15,7 @@ We have used **Aptos snaps** as the infrastructure provider and we have develope
 4. The Aptos snap
 5. Features overview
 6. Technical architecture
+7. [Smart contract technical description](move/sources/README.md)
 
 ## Installation Instructions
 
