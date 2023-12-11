@@ -12,10 +12,11 @@ We have used **Aptos snaps** as the infrastructure provider and we have develope
 ## Contents
 
 1. Installation instructions
-2. Setting precedence
-3. The Aptos snap
-4. Features overview
-5. Technical architecture
+2. Getting Started (Login Steps)
+3. Setting precedence
+4. The Aptos snap
+5. Features overview
+6. Technical architecture
 
 ## Installation Instructions
 
