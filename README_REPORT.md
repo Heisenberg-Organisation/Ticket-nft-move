@@ -80,6 +80,7 @@ Detailed explanation of each function and structs can be found in // link readme
 ## Technical Architecture
 <img width="100%" alt="image" src="https://gist.github.com/assets/59790120/c1744af7-0ceb-475a-b55a-89ed48f8a92a">
 
+
 ### IPFS
 
 We are storing various different types of content - music files, artist thumbnail, banner, and, post content and images. All of these are stored in IPFS (InterPlanetary File System) which is like a giant, distributed file system for the internet, connecting users directly to the content they're looking for. Instead of relying on a centralized server, IPFS uses a decentralized network, making it more resilient and efficient. IPFS stores content using a unique method called content-addressing. Instead of identifying files by their location on a server, each piece of content gets a unique hash based on its content. This hash is like a fingerprint, making retrieval efficient because you can directly ask the network for the content associated with a specific hash, no matter where it's stored in the decentralized network. This information is stored in the eventTickets and Music structs on the blockchain for access of the relevant files as and when required.
