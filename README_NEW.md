@@ -6,7 +6,7 @@
 <br />
 <div align="center">
 
-  <h3 align="center">Aptos Arkadia</h3>
+  <h3 align="center">Aptos Arkadia 🚀 </h3>
 
   <p align="center">
     An interoperable network of dApps build on Aptos, powered by snaps
