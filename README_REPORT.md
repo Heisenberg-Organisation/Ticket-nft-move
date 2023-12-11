@@ -98,7 +98,7 @@ This has been developed using Unity Game engine with multiplayer support. The us
 
 ### Streaming
 
-We have implemented a server-side app that efficiently manages live streaming with AWS IVS. It initializes AWS IVS client, sets up an Express app for JSON requests, generates RSA keys for encryption, and handles CORS. API endpoints create, stop, and start streaming events, interacting seamlessly with AWS IVS via @aws-sdk/client-ivs. The app also integrates input from OBS (Open Broadcaster Software), a popular streaming tool. CORS headers aid cross-origin requests, and RSA encryption secures sensitive data like the playback URL. The app, on port 3000, provides clear instructions for event manipulation through API endpoints.
+We have implemented a server-side app that efficiently manages live streaming with AWS IVS. It initializes AWS IVS client, sets up an Express app for JSON requests, and generates RSA keys for encryption. API endpoints create, stop, and start streaming events, interacting seamlessly with AWS IVS via @aws-sdk/client-ivs. The app also integrates input from any streaming software (like OBS, etc), a popular streaming tool. RSA encryption secures sensitive data like the playback URL. The app, on port 3000, provides clear instructions for event manipulation through API endpoints.
 
 ### Permissionless Streaming Protocol (beta)
 
