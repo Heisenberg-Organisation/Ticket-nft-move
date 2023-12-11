@@ -2,8 +2,7 @@
 
 ## _An interoperable network of dApps build on Aptos, powered by snaps_
 
-// deployed link
-[![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid)
+
 In the dynamic transition from Web2 to Web3, Arkadia presents an interconnected network of apps, establishing an interoperable ecosystem that spans social, content, payments, and gaming domains for music artists and users, powered by the Aptos Snap. Built on the robust foundation of Aptos, our mission is to target the next 100 million users embracing Web3, breaking barriers, and providing cost-effective transactions at scale.
 
 We have used **Aptos snaps** as the infrastructure provider and we have developed an ecosystem around **On-Chain radio** as a use case to our snaps
@@ -16,13 +15,14 @@ We have used **Aptos snaps** as the infrastructure provider and we have develope
 4. The Aptos snap
 5. Features overview
 6. Technical architecture
+7. [Smart contract technical description](move/sources/README.md)
 
 ## Installation Instructions
 
 These are the instructions for running the Arkadia locally:
 
 
-## Getting Started (Login Steps)
+## Getting Started locally
 
 Follow the steps in the given order
 1. Click on "CONNECT WALLET" to connect wallet through Metamask.
