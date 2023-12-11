@@ -39,6 +39,7 @@ When the Dapp makes an RPC request to the snap, it derives the key pair from met
 ## Features overview
 
 //artist user flowchart here
+<img width="100%" alt="image" src="https://github.com/Heisenberg-Organisation/images/blob/main/User_Artist.png">
 
 
 ### Aptos Studio
@@ -47,7 +48,8 @@ A virtual studio for Indie artists where they can create and manage their music 
 Artist can upload music which can be stored as a music NFT via IPFS protocol The artist can also create and schedule a live concert and our smart contract will then mint and sell Air tickets to the users. Clicking the create event button, the artist will get the stream key and server URL which can be used to stream using streaming software such as OBS.
 Artist get real time revenue as user purchase their tickets.
 
-//screen shot of aptos studio here
+// studio ss
+<img width="100%" alt="image" src="https://github.com/Heisenberg-Organisation/images/blob/main/IPFS.png">
 
 ### Aptos Connect
 
@@ -110,7 +112,7 @@ We propose the integration of HTTP Live Streaming (HLS) and the InterPlanetary F
 
 By doing so, we intend to enhance the accessibility of content by leveraging IPFS for distributed storage, thereby diminishing reliance on centralized servers. Additionally, our goal includes implementing adaptive streaming capabilities through HLS, enabling clients to dynamically adjust playback in response to varying network conditions.
 
-// ipfs streaming workflow
+<img width="100%" alt="image" src="https://github.com/Heisenberg-Organisation/images/blob/main/IPFS.png">
 
 The live streaming workflow initiates by sourcing a feed from an RTMP server, serving as the initial hub for receiving the video feed. Following this, the process employs FFmpeg for the transcoding of the RTMP stream into HLS chunks. Concurrently, inotifywait is utilized to monitor changes in the directory where HLS chunks are stored, subsequently triggering actions in the streaming pipeline. Upon the generation of HLS chunks, the corresponding hash is added to the IPFS network, ensuring unique content identification. Subsequently, the M3U8 file, functioning as an HLS manifest, is updated to reflect the newly generated hash, guaranteeing accurate content retrieval. The updated M3U8 file is then published, potentially through a web server, CDN, or other distribution mechanisms, making it accessible to clients. This entire workflow is continuously repeated throughout the live streaming session to ensure the maintenance of an updated stream on IPFS.
 
