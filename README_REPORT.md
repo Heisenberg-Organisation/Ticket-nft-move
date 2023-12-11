@@ -110,7 +110,9 @@ We propose the integration of HTTP Live Streaming (HLS) and the InterPlanetary F
 
 By doing so, we intend to enhance the accessibility of content by leveraging IPFS for distributed storage, thereby diminishing reliance on centralized servers. Additionally, our goal includes implementing adaptive streaming capabilities through HLS, enabling clients to dynamically adjust playback in response to varying network conditions.
 
+<p align="center">
 <img width="40%" alt="image" src="https://github.com/Heisenberg-Organisation/images/blob/main/IPFS.png">
+</p>
 
 The live streaming workflow initiates by sourcing a feed from an RTMP server, serving as the initial hub for receiving the video feed. Following this, the process employs FFmpeg for the transcoding of the RTMP stream into HLS chunks. Concurrently, inotifywait is utilized to monitor changes in the directory where HLS chunks are stored, subsequently triggering actions in the streaming pipeline. Upon the generation of HLS chunks, the corresponding hash is added to the IPFS network, ensuring unique content identification. Subsequently, the M3U8 file, functioning as an HLS manifest, is updated to reflect the newly generated hash, guaranteeing accurate content retrieval. The updated M3U8 file is then published, potentially through a web server, CDN, or other distribution mechanisms, making it accessible to clients. This entire workflow is continuously repeated throughout the live streaming session to ensure the maintenance of an updated stream on IPFS.
 
