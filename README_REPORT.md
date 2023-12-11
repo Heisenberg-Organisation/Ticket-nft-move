@@ -32,7 +32,7 @@ Most of the web2 traffic is composed of social media, content creation, gaming, 
 
 We have created a fully functioning implementation of aptos snaps, that provides full aptos support in not just transactions but also by interacting with smart contracts. We have added support for the aptos sdk to run in the browser environment. We have used Aptos SDK, which provides modular code which is easy to implement and build upon. We follow responsible key management practices, we never store the user’s public or private key, these keys are always derived when needed.
 
-![img]([https://0x0.st/H3J1.jpg](https://0x0.st/H3J1.jpg))
+![img](https://0x0.st/H3J1.jpg)
 
 When the Dapp makes an RPC request to the snap, it derives the key pair from metamask and stores it using manage state in encrypted form. The snap then invokes a method to the Aptos SDK which triggers a method in a smart contract in the Aptos network
 
